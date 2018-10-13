@@ -31,7 +31,8 @@ brfss_tidy = brfss_smart2010 %>%
   janitor::clean_names() %>% 
   select(year, locationabbr, locationdesc, topic, response, data_value, geo_location) %>% 
   filter(topic == "Overall Health") %>% 
-  mutate(perctage = data_value, response = factor(response, levels = c("Excellent","Very good","Good","Fair","Poor" )))
+  rename(prop = data_value) %>% 
+  mutate(response = factor(response, levels = c("Excellent","Very good","Good","Fair","Poor" )))
 ```
 **2. Using this dataset, do or answer the following (commenting on the results of each):**
 **In 2002, which states were observed at 7 locations?**
@@ -49,7 +50,7 @@ brfss_tidy %>%
 ```{r}
 p1 = brfss_tidy %>%
   group_by(locationabbr, year) %>% 
-  mutate(n = n_distinct(geo_location)) %>% filter(year ==2007, n>=40) %>% View()
+  mutate(n = n_distinct(geo_location)) %>% 
   ggplot(aes(x = year, y = n, color = locationabbr)) +
   geom_line(alpha = 0.7, size = 1) + 
   labs(
@@ -66,11 +67,12 @@ p1 = brfss_tidy %>%
         legend.title = element_text(size = 8))
 p1 + guides(col = guide_legend(ncol = 26, nrow = 2, override.aes = list(size = 1.5)))
 ```
-**Comment:**The number of locations in each state from 2002 to 2010 is generally stably below 10 for most states, but there are four states showed some increase and showed number between 10 and 20. In 2007, there is one state  after removing the missing values, it is straight line for all the states.
+**Comment:**The number of locations in each state from 2002 to 2010 is generally stably below 10 for most states, but there are four states showed some increase and showed number between 10 and 20. In 2007, there is one state  showed significantly high number over 40 while its average number in all other years is below 10. After rechecking the data found it is Florida. Florida has 67 counties so the number is possible. In a spaghetti with over 50 variables, which color is what is just imposibble to distinguish, only outstanding values would be easier to recognize.
 
-Make a table showing, for the years 2002, 2006, and 2010, the mean and standard deviation of the proportion of “Excellent” responses across locations in NY State.
+**Make a table showing, for the years 2002, 2006, and 2010, the mean and standard deviation of the proportion of “Excellent” responses across locations in NY State.**
 ```{r}
-
+brfss_tidy %>%
+  filter(year == 2002|2006|2010, locationabbr == "NY",)
 ```
 
 For each year and state, compute the average proportion in each response category (taking the average across locations in a state). Make a five-panel plot that shows, for each response category separately, the distribution of these state-level averages over time.
