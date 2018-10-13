@@ -6,14 +6,22 @@ output: github_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
 library(p8105.datasets)
 library(tidyverse)
 library(ggridges)
+library(viridis)
+library(patchwork)
+knitr::opts_chunk$set(
+  echo = TRUE,
+  fig.width = 6,
+  fig.asp = .6,
+  out.width = "95%"
+)
+theme_set(theme_bw() + theme(legend.position = "bottom"))
 ```
 
 #Problem 1
-1. data cleaning
+**1. data cleaning**
 format the data to use appropriate variable names;
 focus on the “Overall Health” topic
 include only responses from “Excellent” to “Poor”
@@ -25,28 +33,40 @@ brfss_tidy = brfss_smart2010 %>%
   filter(topic == "Overall Health") %>% 
   mutate(perctage = data_value, response = factor(response, levels = c("Excellent","Very good","Good","Fair","Poor" )))
 ```
-2. Using this dataset, do or answer the following (commenting on the results of each):
-In 2002, which states were observed at 7 locations?
-```{r}
+**2. Using this dataset, do or answer the following (commenting on the results of each):**
+**In 2002, which states were observed at 7 locations?**
+```{r who_is_7}
 brfss_tidy %>% 
   filter(year == 2002) %>% 
   group_by(locationabbr) %>% 
-  distinct(geo_location) %>%
-  filter(n() == 7) %>% 
+  distinct(geo_location) %>% 
+  filter(n() == 7) %>%
   summarise()
 ```
-Comment: In 2002, there were three states observed at 7 locations: Connecticut, Florida and North Carolina.
+**Comment:** In 2002, there were three states observed at 7 locations: Connecticut, Florida and North Carolina.
 
-Make a “spaghetti plot” that shows the number of locations in each state from 2002 to 2010.
+**Make a “spaghetti plot” that shows the number of locations in each state from 2002 to 2010.**
 ```{r}
-brfss_tidy %>%
-  group_by(locationabbr) %>% 
-  mutate(n = n_distinct(geo_location, year)) %>% 
-  distinct(year, locationabbr, n) %>% 
-  spread(year, n) %>% View()
+p1 = brfss_tidy %>%
+  group_by(locationabbr, year) %>% 
+  mutate(n = n_distinct(geo_location)) %>% filter(year ==2007, n>=40) %>% View()
   ggplot(aes(x = year, y = n, color = locationabbr)) +
-  geom_line()
+  geom_line(alpha = 0.7, size = 1) + 
+  labs(
+    title = "spaghetti plot of number of locations in each state",
+    x = "year 2002-2008",
+    y = "number of locations",
+    caption = "Data from BRFSS"
+  ) + 
+  scale_x_continuous(breaks = c(2002,2003,2004,2005,2006,2007,2008),
+                     limits = c(2002, 2008)) +
+  viridis::scale_color_viridis(option="inferno", name = "States", discrete = TRUE) +
+  theme(legend.direction = "horizontal", legend.key.size = unit(0.4, "cm"),
+        legend.text = element_text(size = 7.5),
+        legend.title = element_text(size = 8))
+p1 + guides(col = guide_legend(ncol = 26, nrow = 2, override.aes = list(size = 1.5)))
 ```
+**Comment:**The number of locations in each state from 2002 to 2010 is generally stably below 10 for most states, but there are four states showed some increase and showed number between 10 and 20. In 2007, there is one state  after removing the missing values, it is straight line for all the states.
 
 Make a table showing, for the years 2002, 2006, and 2010, the mean and standard deviation of the proportion of “Excellent” responses across locations in NY State.
 ```{r}
@@ -59,8 +79,7 @@ For each year and state, compute the average proportion in each response categor
 ```
 
 #Problem 2
-```{r load_dataset}
-library(p8105.datasets)
+```{r}
 data(instacart)
 ```
 The goal is to do some exploration of this dataset. To that end, write a short description of the dataset, noting the size and structure of the data, describing some key variables, and giving illstrative examples of observations. Then, do or answer the following (commenting on the results of each):
@@ -72,8 +91,7 @@ Make a table showing the mean hour of the day at which Pink Lady Apples and Coff
 
 
 #Problem 3
-```{r load_dataset}
-library(p8105.datasets)
+```{r}
 data("ny_noaa")
 ```
 The goal is to do some exploration of this dataset. To that end, write a short description of the dataset, noting the size and structure of the data, describing some key variables, and indicating the extent to which missing data is an issue. Then, do or answer the following (commenting on the results of each):
