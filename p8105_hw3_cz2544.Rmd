@@ -47,7 +47,7 @@ brfss_tidy %>%
 **Comment:** In 2002, there were three states observed at 7 locations: Connecticut, Florida and North Carolina.
 
 **Make a “spaghetti plot” that shows the number of locations in each state from 2002 to 2010.**
-```{r}
+```{r number_of_each_place_plot}
 p1 = brfss_tidy %>%
   group_by(locationabbr, year) %>% 
   mutate(n = n_distinct(geo_location)) %>% 
@@ -70,15 +70,40 @@ p1 + guides(col = guide_legend(ncol = 26, nrow = 2, override.aes = list(size = 1
 **Comment:**The number of locations in each state from 2002 to 2010 is generally stably below 10 for most states, but there are four states showed some increase and showed number between 10 and 20. In 2007, there is one state  showed significantly high number over 40 while its average number in all other years is below 10. After rechecking the data found it is Florida. Florida has 67 counties so the number is possible. In a spaghetti with over 50 variables, which color is what is just imposibble to distinguish, only outstanding values would be easier to recognize.
 
 **Make a table showing, for the years 2002, 2006, and 2010, the mean and standard deviation of the proportion of “Excellent” responses across locations in NY State.**
-```{r}
+```{r table_new_york_3_year}
 brfss_tidy %>%
-  filter(year == 2002|2006|2010, locationabbr == "NY",)
+  filter(year %in% c(2002, 2006, 2010), locationabbr == "NY", response == "Excellent") %>% 
+  group_by(year) %>% 
+  summarise(mean(prop), sd(prop)) %>% 
+  knitr::kable(digits = 2)
 ```
+**Comment:**The mean and standard deviation of the proportion of “Excellent” responses across locations in NY State is not very different in year 2002, 2006 and 2010. The year 2002 showed slightly higher mean but also higher standard deviation.
 
-For each year and state, compute the average proportion in each response category (taking the average across locations in a state). Make a five-panel plot that shows, for each response category separately, the distribution of these state-level averages over time.
-```{r}
-
+**For each year and state, compute the average proportion in each response category (taking the average across locations in a state). Make a five-panel plot that shows, for each response category separately, the distribution of these state-level averages over time.**
+```{r response_proportion_plot}
+p2 = brfss_tidy %>%
+  group_by(year, locationabbr, response) %>% 
+  mutate(mean = mean(prop)) %>% 
+  distinct(year, locationabbr, mean) %>% #filter(locationabbr == "WV") %>% View()
+  ggplot(aes(x = year, y = mean, color = locationabbr)) +
+  geom_point(size = 1) +
+  geom_line(alpha = 0.3, size = 0.3) +
+  labs(
+    title = "distribution of state-level average proportions over time",
+    x = "year 2002-2008",
+    y = "average proportion %",
+    caption = "Data from BRFSS"
+  ) + 
+  scale_x_continuous(breaks = c(2002,2003,2004,2005,2006,2007,2008),
+                     limits = c(2002, 2008)) +
+  viridis::scale_color_viridis(option="inferno", name = "States", discrete = TRUE) +
+  theme(legend.direction = "horizontal", legend.key.size = unit(0.4, "cm"),
+        legend.text = element_text(size = 7.5),
+        legend.title = element_text(size = 8))+
+  facet_grid(~response) 
+p2 + guides(col = guide_legend(ncol = 26, nrow = 2, override.aes = list(size = 1.5)))
 ```
+**Comment:**The diatribution of mean average proportion in each response category is different, with highest mean average proportion in "Very Good", mainly between 30-40%, then "Good", majority falled into 25-35%, then followed by "Ecxellent", fluctuate between 18-28%. The mean propotion of response "Fair" is 7-15%, and 2-6% for those who responsed "Poor", which showed narrower distribution than the "Good" to "Excellent". It is obvious that one state - "WV", in light lime, had lower average proportion of responses across years in the "Excellent", but higher in the "Poor". The "Overall Health" could be lower in this state due to this noticeable difference in the distribution of average proportion of different responses.
 
 #Problem 2
 ```{r}
