@@ -152,23 +152,24 @@ p3 = instacart %>%
   ggplot(aes(x = n, y = re, color = department, alpha = 0.7)) +
   geom_point(size = 5) +
   scale_x_log10() +
-  scale_y_continuous(labels = percent)
+  scale_y_continuous()+
   labs(
-    title = "distribution of popularity and reorder rate by department",
-    x = "number of purchases",
-    y = "reorder rate",
+    title = "Distribution of popularity and reorder rate by department",
+    x = "Number of purchases",
+    y = "Reorder rate",
     caption = "Data from instacart"
   ) +
   viridis::scale_color_viridis( name = "department", discrete = TRUE) +
   theme(legend.direction = "horizontal", legend.key.size = unit(0.4, "cm"),
         legend.text = element_text(size = 7.5),
         legend.title = element_text(size = 8))
+
 p3_s = p3 + guides(col = guide_legend(ncol = 11, nrow = 2, override.aes = list(size = 1.5)))
 #ggsave("explore_popularity_reorder_diatribution_plot.pdf", p3_s, dpi = 150)
 ```
 
 **2. Questions**
-How many aisles are there, and which aisles are the most items ordered from?
+**How many aisles** are there, and which aisles are the most items ordered from?
 ```{r aisles_analysis}
 instacart %>% 
   group_by(aisle) %>% 
@@ -179,7 +180,7 @@ instacart %>%
 ```
 **Comment:** There are 134 aisles, most items are ordered from fresh vegetables, fresh fruits, packaged  vegetables fruits, yogurt, packaged cheese, water seltzer sparkling water, milk, chips pretzels, soy lactosefree and bread.
 
-Make a plot that shows the number of items ordered in each aisle. Order aisles sensibly, and organize your plot so others can read it.
+**Make a plot** that shows the number of items ordered in each aisle. Order aisles sensibly, and organize your plot so others can read it.
 ```{r plot_aisle_item_number}
 aisle_rank =
   instacart %>% 
@@ -216,7 +217,7 @@ ggsave("aisle_plot.pdf", p4_s, dpi = 600)
 ```
 **Comment:**The range of number of items ordered in each aisle is very big, thus display the number in log transformation might make it easier to read. The size of plot and legend change at different rate while I zoom in and out, ggsave as pdf is a better way to guarantee reproducibility.
 
-Make a table showing the most popular item in each of the aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”.
+**Make a table** showing the most popular item in each of the aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”.
 ```{r table_popular_item_in_three_aisles}
 instacart %>% 
   filter(aisle %in% c("baking ingredients", "dog food care", "packaged vegetables fruits")) %>% 
