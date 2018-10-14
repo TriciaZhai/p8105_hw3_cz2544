@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
   echo = TRUE,
   fig.width = 6,
   fig.asp = .6,
-  out.width = "95%"
+  out.width = "90%"
 )
 theme_set(theme_bw() + theme(legend.position = "bottom"))
 ```
@@ -64,10 +64,11 @@ p1 = brfss_tidy %>%
   scale_x_continuous(breaks = c(2002,2003,2004,2005,2006,2007,2008),
                      limits = c(2002, 2008)) +
   viridis::scale_color_viridis(option="inferno", name = "States", discrete = TRUE) +
-  theme(legend.direction = "horizontal", legend.key.size = unit(0.4, "cm"),
-        legend.text = element_text(size = 7.5),
-        legend.title = element_text(size = 8))
-p1 + guides(col = guide_legend(ncol = 26, nrow = 2, override.aes = list(size = 1.5)))
+  theme(legend.direction = "horizontal", legend.key.size = unit(0.3, "cm"),
+        legend.text = element_text(size = 6),
+        legend.title = element_text(size = 6))
+p1_s = p1 + guides(col = guide_legend(ncol = 26, nrow = 2, override.aes = list(size = 1.5)))
+#ggsave("number_of_each_place_spaghetti_plot.pdf", p1_s, dpi = 600)
 ```
 **Comment:**The number of locations in each state from 2002 to 2010 is generally stably below 10 for most states, but there are four states showed some increase and showed number between 10 and 20. In 2007, there is one state  showed significantly high number over 40 while its average number in all other years is below 10. After rechecking the data found it is Florida. Florida has 67 counties so the number is possible. In a spaghetti with over 50 variables, which color is what is just imposibble to distinguish, only outstanding values would be easier to recognize.
 
@@ -86,34 +87,30 @@ brfss_tidy %>%
 p2 = brfss_tidy %>%
   group_by(year, locationabbr, response) %>% 
   mutate(mean = mean(prop)) %>% 
-<<<<<<< HEAD
   distinct(year, locationabbr, mean) %>% 
   # in case to check the outstanding state "WV", unmute the filter
   #filter(locationabbr == "WV") %>% 
-=======
-  distinct(year, locationabbr, mean) %>% #filter(locationabbr == "WV") %>% View()
->>>>>>> aee9cfe6fb10990c91b4e2b8d57a9e5133b6f881
+  distinct(year, locationabbr, mean) %>% 
   ggplot(aes(x = year, y = mean, color = locationabbr)) +
   geom_point(size = 1) +
   geom_line(alpha = 0.3, size = 0.3) +
   labs(
-    title = "distribution of state-level average proportions over time",
-    x = "year 2002-2008",
-    y = "average proportion %",
+    title = "Distribution of state-level average proportions over time",
+    x = "Year 2002-2008",
+    y = "Average proportion %",
     caption = "Data from BRFSS"
   ) + 
   scale_x_continuous(breaks = c(2002,2003,2004,2005,2006,2007,2008),
                      limits = c(2002, 2008)) +
   viridis::scale_color_viridis(option="inferno", name = "States", discrete = TRUE) +
-  theme(legend.direction = "horizontal", legend.key.size = unit(0.4, "cm"),
-        legend.text = element_text(size = 7.5),
-        legend.title = element_text(size = 8))+
+  theme(axis.text.x = element_text(angle =  -45,size = 7 ),
+        axis.title.x = element_text(size = 9),
+        legend.direction = "horizontal", legend.key.size = unit(0.3, "cm"),
+        legend.text = element_text(size = 6),
+        legend.title = element_text(size = 6))+
   facet_grid(~response) 
-<<<<<<< HEAD
-p2 + guides(col = guide_legend(ncol = 26, nrow = 2, override.aes = list(legend,size = 1.5)))
-=======
-p2 + guides(col = guide_legend(ncol = 26, nrow = 2, override.aes = list(size = 1.5)))
->>>>>>> aee9cfe6fb10990c91b4e2b8d57a9e5133b6f881
+p2_s = p2 + guides(col = guide_legend(ncol = 26, nrow = 2, override.aes = list(size = 1.5)))
+#ggsave("response_proportion_plot.pdf", p2_s, dpi = 600)
 ```
 **Comment:**The diatribution of mean average proportion in each response category is different, with highest mean average proportion in "Very Good", mainly between 30-40%, then "Good", majority falled into 25-35%, then followed by "Ecxellent", fluctuate between 18-28%. The mean propotion of response "Fair" is 7-15%, and 2-6% for those who responsed "Poor", which showed narrower distribution than the "Good" to "Excellent". It is obvious that one state - "WV", in light lime, had lower average proportion of responses across years in the "Excellent", but higher in the "Poor". The "Overall Health" could be lower in this state due to this noticeable difference in the distribution of average proportion of different responses.
 
@@ -125,12 +122,14 @@ skimr::skim(instacart)
 **1. Exploration of dataset**. 
 Write a short description of the dataset, noting the size and structure of the data, describing some key variables, and giving illstrative examples of observations. Then, do or answer the following (commenting on the results of each):
 
-**Description**The dataset has 15 variables and 1384617 observations without missing values. The names have been cleaned with character variables of aisle, department, eval_set and product_name, integer variables of add_to_cart_order, aisle_id, days_since_prior_order, department_id, order_dow, order_hour_of_day, order_id, order_number, product_id, reordered and user_id. The variables can be put into 6 classes: 1.id to track a order/orderer (order, user)(id), 2. order time/location distribution (order_hour_of_day, order_number), 3. catergories and identification of a product (department, aisle, product)(name, id), 4. frequency of order (reorder, days_since_prior_order), 5. other character of user behavior (add_to_cart_order). And two variables I don not know what exactly meaning is (order_dow, , order_number).
+**Description**The dataset has 15 variables and 1384617 observations without missing values. The names have been cleaned with character variables of aisle, department, eval_set and product_name, integer variables of add_to_cart_order, aisle_id, days_since_prior_order, department_id, order_dow, order_hour_of_day, order_id, order_number, product_id, reordered and user_id. The variables can be put into 6 classes: 1.id to track a order/orderer (order, user)(id), 2. catergories and identification of a product (department, aisle, product)(name, id), 3. order time/location distribution (order_hour_of_day, order_dow, eval_set), 4. frequency of order (reorder, days_since_prior_order), 5. other character of user behavior (add_to_cart_order). And two variables I don not know what exactly meaning yet is (order_number).
 
-It seems to be a dataset about shopping records of `r n_distinct(instacart$user_id)` users and their `r n_distinct(instacart$order_id)` orders, thus each user had made only one order during the dataset study period of one day through 0 to 23, most often between`r quantile(instacart$order_hour_of_day,c(0.25, 0.75))`,  all happened in eval_set of train. There are a total `r n_distinct(instacart$product_id)` kinds of products, in `r n_distinct(instacart$department)` departments and `r n_distinct(instacart$aisle)` aisles. Products, aisles, and departments were recored with both name(character) and ID(integer). 
+It seems to be a dataset about shopping records of `r n_distinct(instacart$user_id)` users and their `r n_distinct(instacart$order_id)` orders, thus each user had made only one order during the dataset study period. 
+There is a total `r n_distinct(instacart$product_id)` kinds of products, in `r n_distinct(instacart$department)` departments and `r n_distinct(instacart$aisle)` aisles. Products, aisles, and departments were recored with both name(character) and ID(integer). 
+Through 0 to 23, orders are most often made at`r median(instacart$order_hour_of_day)`, mostly between`r quantile(instacart$order_hour_of_day,c(0.25, 0.75))`. Throuhgh day 0 to 6 in a week, orders are most often made at`r median(instacart$order_dow)`, mostly between`r quantile(instacart$order_dow, c(0.25, 0.75))`.  Train is the only location in eval_set. 
 The average reorder rate is `r mean(instacart$reorder)`, with average days since prior order of `r mean(instacart$days_since_prior_order)`+/-`r sd(instacart$days_since_prior_order)`, the median is `r median(instacart$days_since_prior_order)`, range between `r quantile(instacart$days_since_prior_order, c(0,1))`.
 The mean number of add_to_cart_order is `r mean(instacart$add_to_cart_order)`+/-`r sd(instacart$add_to_cart_order)`, and the median is `r median(instacart$add_to_cart_order)`, range between `r quantile(instacart$add_to_cart_order, c(0,1))`.
-The mean number of order_dow is `r mean(instacart$order_dow)`+/-`r sd(instacart$order_dow)`, and median is `r median(instacart$order_dow)`, range between `r quantile(instacart$order_dow, c(0,1))`. The mean number of order_number is `r mean(instacart$order_number)`+/-`r sd(instacart$order_number)`, and median is `r median(instacart$order_number)`, range between `r quantile(instacart$order_number, c(0,1))`.
+The mean number of order_number is `r mean(instacart$order_number)`+/-`r sd(instacart$order_number)`, and median is `r median(instacart$order_number)`, range between `r quantile(instacart$order_number, c(0,1))`.
 ```{r explore_most_popular}
 instacart %>% 
   group_by(product_name) %>% 
@@ -146,7 +145,7 @@ instacart %>%
 The top 3 popular products are : Banana, Bag of Organic Bananas, and Organic Strawberries, all sold over 10000, with mean reorder rate of 0.88, 0.86, 0.79 and mean days since prior order for these products are 16.71, 15.74 and 15.45. The 4th and 5th most popular products are Large Lemon and Organic Baby Spinach, bought 9784 and 8135 times with mean reorder rate of 0.82, 0.73 and mean days since prior order 17.12, 17.58.
 
 The following is a plot showing how products of different departments is distributed in different reorder rate and number of purchases. It may crash R so it won't run during the knitting.
-```{r explore_popularity_diatribution, eval = FALSE}
+```{r explore_popularity_reorder_diatribution, eval = FALSE}
 p3 = instacart %>% 
   group_by(department) %>% 
   mutate(n = n(), re = mean(reordered), t = mean(days_since_prior_order)) %>% 
@@ -164,7 +163,8 @@ p3 = instacart %>%
   theme(legend.direction = "horizontal", legend.key.size = unit(0.4, "cm"),
         legend.text = element_text(size = 7.5),
         legend.title = element_text(size = 8))
-p3 + guides(col = guide_legend(ncol = 11, nrow = 2, override.aes = list(size = 1.5)))
+p3_s = p3 + guides(col = guide_legend(ncol = 11, nrow = 2, override.aes = list(size = 1.5)))
+#ggsave("explore_popularity_reorder_diatribution_plot.pdf", p3_s, dpi = 150)
 ```
 
 **2. Questions**
@@ -184,33 +184,54 @@ Make a plot that shows the number of items ordered in each aisle. Order aisles s
 aisle_rank =
   instacart %>% 
   group_by(aisle) %>% 
-  summarise(n= n()) %>%
-  arrange((n)) %>% 
-  mutate(rank = row_number(), aisle = factor(aisle, levels = c(aisle)) )
+  summarise(n = n()) %>% 
+  arrange((n)) %>%
+  mutate(rank = row_number(), aisle = factor(aisle, levels = c(aisle))) %>% 
 
 p4 = aisle_rank %>% 
   ggplot(aes(x = rank, y = n, color = aisle)) +
-  geom_point(size = 2) +
-  scale_y_log10() +
+  geom_point(size = 1.5) +
+  scale_y_continuous(trans ='log10') +
   scale_x_discrete() +
   labs(
-    title = "number of items ordered by aisle",
-    y = "aisle",
-    x = "number of items",
+    title = "Number of items ordered by aisle",
+    y = "Aisle",
+    x = "Number of items",
     caption = "Data from instacart"
   ) +
   viridis::scale_color_viridis( name = "aisle", discrete = TRUE) +
-  theme(legend.direction = "horizontal", legend.key.size = unit(2, "mm"),
-        legend.title = element_text(size = 3.5))
+  theme(legend.direction = "horizontal", legend.title =  NULL)
   
-p4 + guides(col = guide_legend(label.theme = element_text(angle = -90, size = 4), label.position = "bottom",
-                               ncol = 134, nrow = 1, override.aes = list(legend.position = "bottom", size = 2)))
+p4_s = p4 + guides(size = "none", title = element_text(size = 4),
+                   axis.title.x = element_text(size = 3), 
+                   axis.title.y = element_text(size = 3), axis.text.y = element_text(size = 2),
+                   col = guide_legend(label.theme = element_text(angle = -90, size = 2), 
+                               label.position = "bottom", label.vjust = 0, title = NULL,
+                               ncol = 134, nrow = 1, keywidth = unit(0.12, "mm"),
+                               override.aes = list(legend.position = "bottom", size = 0.8)))
+ggsave("aisle_plot.pdf", p4_s, dpi = 600)
 ```
-**Comment:**The range of number of items ordered in each aisle is very big, thus display the number in log transformation might make it easier to read.
+**Comment:**The range of number of items ordered in each aisle is very big, thus display the number in log transformation might make it easier to read. The size of plot and legend change at different rate while I zoom in and out, ggsave as pdf is a better way to guarantee reproducibility.
 
 Make a table showing the most popular item in each of the aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”.
 ```{r table_popular_item_in_three_aisles}
 instacart %>% 
+  filter(aisle %in% c("baking ingredients", "dog food care", "packaged vegetables fruits")) %>% 
+  select(aisle, product_name) %>%  
+  group_by(aisle, product_name) %>% 
+  summarise(n=n()) %>%  
+  arrange(desc(n)) %>% View()
+  distinct(aisle, product_name, n) %>% 
+  spread(key = aisle, value = c("baking ingredients", "dog food care", "packaged vegetables fruits")) %>% View()
+  head() %>%
+  knitr::kable(digits = 2)
+```
+
+
+Make a table showing the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week; format this table for human readers (i.e. produce a 2 x 7 table).
+```{r table_hour_Apples_Coffee_Ice_Cream}
+instacart %>%
+  filter(product_name %in% c("Pink Lady Apples","Coffee Ice Cream")) %>% 
   group_by(aisle) %>% 
   summarise(n= n()) %>%
   arrange(n) %>% 
@@ -219,8 +240,6 @@ filter(row_number() <= 10) %>%
   knitr::kable(digits = 2)
 ```
 
-
-Make a table showing the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week; format this table for human readers (i.e. produce a 2 x 7 table).
 **Comment:**
 
 
