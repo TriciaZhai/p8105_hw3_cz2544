@@ -149,8 +149,8 @@ The following is a plot showing how products of different departments is distrib
 p3 = instacart %>% 
   group_by(department) %>% 
   mutate(n = n(), re = mean(reordered), t = mean(days_since_prior_order)) %>% 
-  ggplot(aes(x = n, y = re, color = department, alpha = 0.7)) +
-  geom_point(size = 5) +
+  ggplot(aes(x = n, y = re, color = department)) +
+  geom_point(size = 3) +
   scale_x_log10() +
   scale_y_continuous()+
   labs(
@@ -165,7 +165,7 @@ p3 = instacart %>%
         legend.title = element_text(size = 8))
 
 p3_s = p3 + guides(col = guide_legend(ncol = 11, nrow = 2, override.aes = list(size = 1.5)))
-#ggsave("explore_popularity_reorder_diatribution_plot.pdf", p3_s, dpi = 150)
+ggsave("explore_popularity_reorder_diatribution_plot.pdf", p3_s, dpi = 300)
 ```
 
 **2. Questions**
@@ -231,32 +231,74 @@ instacart %>%
 ```
 **Comment:**The most popular item in baking ingredients is Light Brown Sugar, bought 499 times; The most popular item in dog food care is Snack Sticks Chicken & Rice Recipe Dog Treats bought 30 times, and The most popular item in packaged vegetables fruits is Organic Baby Spinach, bought 9784 times. As shown previously, there is huge differences in popularity of total purchases in different aisles, now find out the popularity difference in most popular items in different aisles is not a supprise. 
 
-Make a table showing the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week; format this table for human readers (i.e. produce a 2 x 7 table).
+**Make a table** showing the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week; format this table for human readers (i.e. produce a 2 x 7 table).
 ```{r table_hour_Apples_Coffee_Ice_Cream}
 instacart %>%
   filter(product_name %in% c("Pink Lady Apples","Coffee Ice Cream")) %>% 
-  group_by(aisle) %>% 
-  summarise(n= n()) %>%
-  arrange(n) %>% 
-  mutate(rank = row_number()) %>% 
-filter(row_number() <= 10) %>% 
+  select(product_name, order_dow, order_hour_of_day) %>%  
+  group_by(product_name, order_dow) %>% 
+  summarise(hour = mean(order_hour_of_day)) %>% 
+  spread(key = order_dow, hour) %>% 
   knitr::kable(digits = 2)
 ```
 
-**Comment:**
-
-
+**Comment:**The mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week are slightly different, Coffee Ice Cream ranged from 12.26 to 15.38 while Pink Lady Apples ranged 11.36 to 13.44. On Sunday and Friday, the mean hour for the two different product showed small difference around 0.5 hour, on Monday, Wednesday and Saturday around 1 hour, while on Tueday and Thurday it was over 3.6 hour. Friday is the only day that mean hour of Pink Lady Apples is larger than that of Coffee Icecream's. Sunday is the day with samllest difference of 0.33 hour and Tuesday is of the largest difference of 3.68.
 
 #Problem 3
 ```{r}
 data("ny_noaa")
 ```
-The goal is to do some exploration of this dataset. To that end, write a short description of the dataset, noting the size and structure of the data, describing some key variables, and indicating the extent to which missing data is an issue. Then, do or answer the following (commenting on the results of each):
+The goal is to do some exploration of this dataset. To that end, write a short description of the dataset, noting the size and structure of the data, describing some key variables, and indicating the extent to which missing data is an issue. 
+**1. Exploration of dataset**. 
+```{r }
+ny_noaa %>% 
+  skimr::skim()
+```
+**Description**: There are 7 variables with 2595176 statistics in this dataset. The variables are of three type: One date variable range from 1981-01-01 to 1997-01-21, total 10957 days. Three characters variables id, tmax and tmin, there is 747 unique ids, 43.7% of tmax(1134358/2595176) and tmin(1134420/2595176) values are missing. There is three integer variables prcp, snow and snwd, all with high percentage of missing values, namely 5.65% = (145838/2595176) for prcp, 14.69% = (381221/2595176) for snow and 22.80% = (591786/2595176) for snwd. All three distribution of data are very skewed. The outliers are very large accompanied by over half in prcp or over 75% in snow and snwd of the values equals 0.
 
-Do some data cleaning. Create separate variables for year, month, and day. Ensure observations for temperature, precipitation, and snowfall are given in reasonable units. For snowfall, what are the most commonly observed values? Why?
-Make a two-panel plot showing the average max temperature in January and in July in each station across years. Is there any observable / interpretable structure? Any outliers?
-Make a two-panel plot showing (i) tmax vs tmin for the full dataset (note that a scatterplot may not be the best option); and (ii) make a plot showing the distribution of snowfall values greater than 0 and less than 100 separately by year.
 
+**2. Questions**
+**data cleaning**. Create separate variables for year, month, and day. Ensure observations for temperature, precipitation, and snowfall are given in reasonable units. 
+```{r clean_noaa}
+ny_noaa1 = ny_noaa %>% 
+  separate("date", c("year", "month", "day"), sep = "-") %>% 
+  mutate(prcp_mm = prcp/10, snow_cm = snow/10, snwd_cm = snwd/10, 
+         tmax_c = as.numeric(tmax)/10, tmin_c = as.numeric(tmin)/10) %>% 
+  select(id, year:day, prcp_mm:tmin_c)
+```
+**Comment:** 
+According to https://www1.ncdc.noaa.gov/pub/data/ghcn/daily/readme.txt, the five core elements are:
+PRCP = Precipitation (tenths of mm)
+SNOW = Snowfall (mm)
+SNWD = Snow depth (mm)
+TMAX = Maximum temperature (tenths of degrees C)
+TMIN = Minimum temperature (tenths of degrees C)
+
+While by https://en.wikipedia.org/wiki/Climate_of_New_York, the measurement units are:
+Greatest 24-hour precipitation:	13.57 inches or 34.5 cm or 345 mm
+Greatest 24-hour snowfall :	49 inches or 120 cm
+Greatest Snow Depth: 119 inches or 300 cm
+Highest temperature: 108 °F or 42.2 °C
+Lowest temperature:	−52 °F or −46.7 °C
+
+I decided to change the units to the wikipedia format.
+**For snowfall, what are the most commonly observed values? Why?**
+```{r}
+
+```
+
+**Make a two-panel plot** showing the average max temperature in January and in July in each station across years. Is there any observable / interpretable structure? Any outliers?
+```{r}
+
+```
+
+**Make a two-panel plot** showing:
+(i) tmax vs tmin for the full dataset (note that a scatterplot may not be the best option); 
+(ii) make a plot showing the distribution of snowfall values greater than 0 and less than 100 separately by year.
+
+```{r}
+
+```
 
 
 ## R Markdown
