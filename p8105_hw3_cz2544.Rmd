@@ -186,10 +186,10 @@ aisle_rank =
   group_by(aisle) %>% 
   summarise(n = n()) %>% 
   arrange((n)) %>%
-  mutate(rank = row_number(), aisle = factor(aisle, levels = c(aisle))) %>% 
+  mutate(rank = row_number(), aisle_r = factor(aisle, levels = c(aisle))) 
 
 p4 = aisle_rank %>% 
-  ggplot(aes(x = rank, y = n, color = aisle)) +
+  ggplot(aes(x = rank, y = n, color = aisle_r)) +
   geom_point(size = 1.5) +
   scale_y_continuous(trans ='log10') +
   scale_x_discrete() +
@@ -199,16 +199,19 @@ p4 = aisle_rank %>%
     x = "Number of items",
     caption = "Data from instacart"
   ) +
-  viridis::scale_color_viridis( name = "aisle", discrete = TRUE) +
-  theme(legend.direction = "horizontal", legend.title =  NULL)
-  
-p4_s = p4 + guides(size = "none", title = element_text(size = 4),
-                   axis.title.x = element_text(size = 3), 
-                   axis.title.y = element_text(size = 3), axis.text.y = element_text(size = 2),
-                   col = guide_legend(label.theme = element_text(angle = -90, size = 2), 
-                               label.position = "bottom", label.vjust = 0, title = NULL,
-                               ncol = 134, nrow = 1, keywidth = unit(0.12, "mm"),
-                               override.aes = list(legend.position = "bottom", size = 0.8)))
+  viridis::scale_color_viridis( name = "aisle_r", discrete = TRUE) +
+  theme(legend.direction = "horizontal", 
+        legend.key.size = unit(1, "mm"), legend.spacing = unit(-0.2, "mm"),
+        plot.title = element_text(size = 6), plot.caption = element_text(size = 6),
+        axis.title.x = element_text(size = 6), axis.title.y = element_text(size = 5),
+        axis.text.y = element_text(size = 4))
+
+p4_s = p4 + guides(col = guide_legend(ncol = 134, nrow = 1,
+                                      label.position = "bottom", label.hjust = 0, label.vjust = 0, title.vjust = -0.5,
+                                      label.theme = element_text(angle = -90, size = 3),
+                                      title.theme = element_text(angle = -90, size = 0),
+                                      lable.position = "bottom",
+                                      override.aes = list(legend.position = "bottom", size = 0.48)))
 ggsave("aisle_plot.pdf", p4_s, dpi = 600)
 ```
 **Comment:**The range of number of items ordered in each aisle is very big, thus display the number in log transformation might make it easier to read. The size of plot and legend change at different rate while I zoom in and out, ggsave as pdf is a better way to guarantee reproducibility.
@@ -219,14 +222,13 @@ instacart %>%
   filter(aisle %in% c("baking ingredients", "dog food care", "packaged vegetables fruits")) %>% 
   select(aisle, product_name) %>%  
   group_by(aisle, product_name) %>% 
-  summarise(n=n()) %>%  
-  arrange(desc(n)) %>% View()
-  distinct(aisle, product_name, n) %>% 
-  spread(key = aisle, value = c("baking ingredients", "dog food care", "packaged vegetables fruits")) %>% View()
-  head() %>%
+  summarise(n = n()) %>% 
+  ungroup() %>%
+  group_by(aisle) %>% 
+  filter(n == max(n)) %>% 
   knitr::kable(digits = 2)
 ```
-
+**Comment:**The most popular item in baking ingredients is Light Brown Sugar, bought 499 times; The most popular item in dog food care is Snack Sticks Chicken & Rice Recipe Dog Treats bought 30 times, and The most popular item in packaged vegetables fruits is Organic Baby Spinach, bought 9784 times. As shown previously, there is huge differences in popularity of total purchases in different aisles, now find out the popularity difference in most popular items in different aisles is not a supprise. 
 
 Make a table showing the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week; format this table for human readers (i.e. produce a 2 x 7 table).
 ```{r table_hour_Apples_Coffee_Ice_Cream}
