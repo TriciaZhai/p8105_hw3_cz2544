@@ -86,9 +86,13 @@ brfss_tidy %>%
 p2 = brfss_tidy %>%
   group_by(year, locationabbr, response) %>% 
   mutate(mean = mean(prop)) %>% 
+<<<<<<< HEAD
   distinct(year, locationabbr, mean) %>% 
   # in case to check the outstanding state "WV", unmute the filter
   #filter(locationabbr == "WV") %>% 
+=======
+  distinct(year, locationabbr, mean) %>% #filter(locationabbr == "WV") %>% View()
+>>>>>>> aee9cfe6fb10990c91b4e2b8d57a9e5133b6f881
   ggplot(aes(x = year, y = mean, color = locationabbr)) +
   geom_point(size = 1) +
   geom_line(alpha = 0.3, size = 0.3) +
@@ -105,7 +109,11 @@ p2 = brfss_tidy %>%
         legend.text = element_text(size = 7.5),
         legend.title = element_text(size = 8))+
   facet_grid(~response) 
+<<<<<<< HEAD
 p2 + guides(col = guide_legend(ncol = 26, nrow = 2, override.aes = list(legend,size = 1.5)))
+=======
+p2 + guides(col = guide_legend(ncol = 26, nrow = 2, override.aes = list(size = 1.5)))
+>>>>>>> aee9cfe6fb10990c91b4e2b8d57a9e5133b6f881
 ```
 **Comment:**The diatribution of mean average proportion in each response category is different, with highest mean average proportion in "Very Good", mainly between 30-40%, then "Good", majority falled into 25-35%, then followed by "Ecxellent", fluctuate between 18-28%. The mean propotion of response "Fair" is 7-15%, and 2-6% for those who responsed "Poor", which showed narrower distribution than the "Good" to "Excellent". It is obvious that one state - "WV", in light lime, had lower average proportion of responses across years in the "Excellent", but higher in the "Poor". The "Overall Health" could be lower in this state due to this noticeable difference in the distribution of average proportion of different responses.
 
