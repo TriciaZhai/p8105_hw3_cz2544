@@ -195,8 +195,8 @@ p3 = instacart %>%
   ) +
   viridis::scale_color_viridis( name = "department", discrete = TRUE) +
   theme(legend.direction = "horizontal", legend.key.size = unit(0.4, "cm"),
-        legend.text = element_text(size = 7.5),
-        legend.title = element_text(size = 8))
+        legend.text = element_text(size = 5),
+        legend.title = element_text(size = 5))
 
 p3_s = p3 + guides(col = guide_legend(ncol = 11, nrow = 2, override.aes = list(size = 1.5)))
 ggsave("explore_popularity_reorder_diatribution_plot.pdf", p3_s, dpi = 300)
