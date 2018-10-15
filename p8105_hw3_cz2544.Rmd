@@ -109,20 +109,19 @@ p2 = brfss_tidy %>%
   geom_line(alpha = 0.3, size = 0.3) +
   labs(
     title = "Distribution of state-level average proportions over time",
-    x = "Year 2002-2008",
+    x = NULL,
     y = "Average proportion %",
     caption = "Data from BRFSS"
   ) + 
   scale_x_continuous(breaks = c(2002,2003,2004,2005,2006,2007,2008),
                      limits = c(2002, 2008)) +
   viridis::scale_color_viridis(option="inferno", name = "States", discrete = TRUE) +
-  theme(axis.text.x = element_text(angle =  -45,size = 7 ),
-        axis.title.x = element_text(size = 9),
+  theme(axis.text.x = element_text(angle =  -45,size = 6 ),
         legend.direction = "horizontal", legend.key.size = unit(0.3, "cm"),
-        legend.text = element_text(size = 6),
-        legend.title = element_text(size = 6))+
+        legend.text = element_text(size = 4),
+        legend.title = element_text(size = 5))+
   facet_grid(~response) 
-p2_s = p2 + guides(col = guide_legend(ncol = 26, nrow = 2, override.aes = list(size = 1.5)))
+p2_s = p2 + guides(col = guide_legend(ncol = 26, nrow = 2, override.aes = list(size = 1)))
 ggsave("response_proportion_plot.pdf", p2_s, dpi = 600)
 p2_s
 ```
@@ -248,8 +247,8 @@ p4 = aisle_rank %>%
 
 p4_s = p4 + guides(col = guide_legend(ncol = 134, nrow = 1,
                                       label.position = "bottom", label.hjust = 0,
-                                      label.vjust = 0,title.vjust = -0.5,
-                                      label.theme = element_text(angle = -90, size = 3),
+                                      label.vjust = 0,title.vjust = 0.2,
+                                      label.theme = element_text(angle = -90, size = 2.2),
                                       title.theme = element_text(angle = -90, size = 0),
                                       lable.position = "bottom",
                                       override.aes = list(legend.position = "bottom", size = 0.48)))
