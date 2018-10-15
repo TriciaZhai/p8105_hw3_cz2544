@@ -118,9 +118,9 @@ p2_s
 **Comment:**The diatribution of mean average proportion in each response category is different, with highest mean average proportion in "Very Good", mainly between 30-40%, then "Good", majority falled into 25-35%, then followed by "Ecxellent", fluctuate between 18-28%. The mean propotion of response "Fair" is 7-15%, and 2-6% for those who responsed "Poor", which showed narrower distribution than the "Good" to "Excellent". It is obvious that one state - "WV", in light lime, had lower average proportion of responses across years in the "Excellent", but higher in the "Poor". The "Overall Health" could be lower in this state due to this noticeable difference in the distribution of average proportion of different responses.
 
 #Problem 2
-```{r load_food_data}
+```{r load_food_data, results= ='hide'}
 data(instacart)
-skimr::skim(instacart)
+skimr::skim(instacart) %>% 
 ```
 **1. Exploration of dataset**. 
 Write a short description of the dataset, noting the size and structure of the data, describing some key variables, and giving illstrative examples of observations. Then, do or answer the following (commenting on the results of each):
