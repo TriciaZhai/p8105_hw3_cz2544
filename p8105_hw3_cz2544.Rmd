@@ -44,6 +44,7 @@ brfss_tidy %>%
   filter(n() == 7) %>%
   summarise()
 ```
+
 **Comment:** In 2002, there were three states observed at 7 locations: Connecticut, Florida and North Carolina.
 
 **Make a “spaghetti plot” that shows the number of locations in each state from 2002 to 2010.**
