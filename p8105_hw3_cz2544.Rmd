@@ -68,7 +68,8 @@ p1 = brfss_tidy %>%
         legend.text = element_text(size = 6),
         legend.title = element_text(size = 6))
 p1_s = p1 + guides(col = guide_legend(ncol = 26, nrow = 2, override.aes = list(size = 1.5)))
-#ggsave("number_of_each_place_spaghetti_plot.pdf", p1_s, dpi = 600)
+ggsave("number_of_each_place_spaghetti_plot.pdf", p1_s, dpi = 600)
+p1_s
 ```
 **Comment:**The number of locations in each state from 2002 to 2010 is generally stably below 10 for most states, but there are four states showed some increase and showed number between 10 and 20. In 2007, there is one state  showed significantly high number over 40 while its average number in all other years is below 10. After rechecking the data found it is Florida. Florida has 67 counties so the number is possible. In a spaghetti with over 50 variables, which color is what is just imposibble to distinguish, only outstanding values would be easier to recognize.
 
@@ -110,7 +111,8 @@ p2 = brfss_tidy %>%
         legend.title = element_text(size = 6))+
   facet_grid(~response) 
 p2_s = p2 + guides(col = guide_legend(ncol = 26, nrow = 2, override.aes = list(size = 1.5)))
-#ggsave("response_proportion_plot.pdf", p2_s, dpi = 600)
+ggsave("response_proportion_plot.pdf", p2_s, dpi = 600)
+p2_s
 ```
 **Comment:**The diatribution of mean average proportion in each response category is different, with highest mean average proportion in "Very Good", mainly between 30-40%, then "Good", majority falled into 25-35%, then followed by "Ecxellent", fluctuate between 18-28%. The mean propotion of response "Fair" is 7-15%, and 2-6% for those who responsed "Poor", which showed narrower distribution than the "Good" to "Excellent". It is obvious that one state - "WV", in light lime, had lower average proportion of responses across years in the "Excellent", but higher in the "Poor". The "Overall Health" could be lower in this state due to this noticeable difference in the distribution of average proportion of different responses.
 
@@ -166,6 +168,7 @@ p3 = instacart %>%
 
 p3_s = p3 + guides(col = guide_legend(ncol = 11, nrow = 2, override.aes = list(size = 1.5)))
 ggsave("explore_popularity_reorder_diatribution_plot.pdf", p3_s, dpi = 300)
+p3_s
 ```
 
 **2. Questions**
@@ -208,12 +211,14 @@ p4 = aisle_rank %>%
         axis.text.y = element_text(size = 4))
 
 p4_s = p4 + guides(col = guide_legend(ncol = 134, nrow = 1,
-                                      label.position = "bottom", label.hjust = 0, label.vjust = 0, title.vjust = -0.5,
+                                      label.position = "bottom", label.hjust = 0,
+                                      label.vjust = 0,title.vjust = -0.5,
                                       label.theme = element_text(angle = -90, size = 3),
                                       title.theme = element_text(angle = -90, size = 0),
                                       lable.position = "bottom",
                                       override.aes = list(legend.position = "bottom", size = 0.48)))
 ggsave("aisle_plot.pdf", p4_s, dpi = 600)
+p4_s
 ```
 **Comment:**The range of number of items ordered in each aisle is very big, thus display the number in log transformation might make it easier to read. The size of plot and legend change at different rate while I zoom in and out, ggsave as pdf is a better way to guarantee reproducibility.
 
@@ -282,41 +287,92 @@ Highest temperature: 108 °F or 42.2 °C
 Lowest temperature:	−52 °F or −46.7 °C
 
 I decided to change the units to the wikipedia format.
-**For snowfall, what are the most commonly observed values? Why?**
-```{r}
 
+**For snowfall, what are the most commonly observed values? Why?**
+```{r snow_mode}
+ny_noaa1 %>% 
+  group_by(snow_cm) %>% 
+  summarise(n = n()) %>% 
+  arrange(desc(n)) %>% 
+  head() %>% 
+  knitr::kable() 
 ```
+**Comment:** The most common observed values for snowfall are 0 (2008508 observations), NA (381221 observations), and followed by 2.5cm, 1.3cm, 5.1cm and 7.6cm. For the climate of New York state is generally humid continental, and there is no snow in majority of the months.
 
 **Make a two-panel plot** showing the average max temperature in January and in July in each station across years. Is there any observable / interpretable structure? Any outliers?
-```{r}
-
+```{r tmax_1_7_plot}
+p5 = ny_noaa1 %>% 
+  filter(month %in% c("01", "07")) %>% 
+  group_by(id, month) %>% 
+  summarise(mean_tmax = mean(tmax_c, na.rm = TRUE), cmplt_rate = 1 - sum(is.na(tmax_c))/n()) %>% 
+  arrange(mean_tmax) %>% 
+  ggplot(aes(x = cmplt_rate, y = mean_tmax, color = id, alpha = cmplt_rate, legend = FALSE)) +
+         geom_point(size = 1) +
+  labs(
+    title = "Average max temperature in January and in July",
+    y = "Max temperature C",
+    x = "Data complete rate",
+    caption = "Data from ny_noaa"
+  ) +
+  facet_grid(~ month) +
+    viridis::scale_color_viridis(option = "magma", name = "id", discrete = TRUE) +
+  theme(legend.position="none") 
+ggsave("tmax_in_jan_jul.pdf", p5, dpi = 300)
+p5
 ```
+**Comment:** There is only 150 complete records, while the rest contains different amount of NAs. I plotted the average max temperature in January and in July and the distribution of defferent percentage of NAs. In January, the average max temperature is between -6°C and 6°C for most stations, there are three outliers fell below the range, namely with about 99%, 30% and 10% NAs. In July, the average max temperature is around 23°C to 32°C, no significant outlier has been ovserved. 
 
 **Make a two-panel plot** showing:
 (i) tmax vs tmin for the full dataset (note that a scatterplot may not be the best option); 
 (ii) make a plot showing the distribution of snowfall values greater than 0 and less than 100 separately by year.
 
-```{r}
+```{r tmax_tmin_snow_plot}
+p6 = ny_noaa1 %>% 
+  select(id, year, tmax_c, tmin_c) %>% 
+  ggplot(aes(x = tmin_c, y = tmax_c)) +
+  geom_smooth(se = TRUE)+
+  labs(
+    title = "Overall tmax vs tmin",
+    y = "°C",
+    x = "°C",
+    caption = "Data from ny_noaa"
+  ) 
 
+p7_1 = ny_noaa1 %>%
+  mutate(year = as.numeric(year)) %>% 
+  filter(snow_cm >0, snow_cm <100, year >=1981, year<=1990 ) %>%
+  select(year, month, snow_cm) %>% 
+  ggplot(aes(x = snow_cm, color = "navy")) +
+  geom_density() +
+  labs(
+    title = "Distribution of snowfall",
+    x = "Snowfall cm"
+  ) +
+  facet_grid(rows = vars(year)) +
+  theme(axis.text.y = element_text(size = 4))
+  
+p7_2 =  ny_noaa1 %>%
+  mutate(year = as.numeric(year)) %>% 
+  filter(snow_cm >0, snow_cm <100, year >=1991, year<=2000 ) %>%
+  select(year, month, snow_cm) %>% 
+  ggplot(aes(x = snow_cm, color = "navy")) +
+  geom_density() + 
+  labs(x = NULL) +
+  facet_grid(rows = vars(year)) +
+  theme(axis.text.y = element_text(size = 4)) 
+
+p7_3 =  ny_noaa1 %>%
+  mutate(year = as.numeric(year)) %>% 
+  filter(snow_cm >0, snow_cm <100, year >=2001, year<=2010 ) %>%
+  select(year, month, snow_cm) %>% 
+  ggplot(aes(x = snow_cm, color = "navy")) +
+  geom_density() +
+  labs( x = NULL,
+        caption = "Data from ny_noaa") +
+  facet_grid(rows = vars(year)) +
+  theme(axis.text.y = element_text(size = 4))  
+  
+p8 = (p6 + (p7_1 + p7_2 + p7_3)) 
+ggsave("tmax_tmin_snow_plot.pdf", p8, dpi = 300)
+p8
 ```
-
-
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
-```
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
