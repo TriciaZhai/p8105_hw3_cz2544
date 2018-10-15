@@ -11,11 +11,14 @@ library(tidyverse)
 library(ggridges)
 library(viridis)
 library(patchwork)
+library(pander)
+panderOptions('round', 3)
+panderOptions('keep.trailing.zeros', TRUE)
 knitr::opts_chunk$set(
   echo = TRUE,
   fig.width = 6,
   fig.asp = .6,
-  out.width = "90%"
+  out.width = "95%"
 )
 theme_set(theme_bw() + theme(legend.position = "bottom"))
 ```
@@ -118,9 +121,9 @@ p2_s
 **Comment:**The diatribution of mean average proportion in each response category is different, with highest mean average proportion in "Very Good", mainly between 30-40%, then "Good", majority falled into 25-35%, then followed by "Ecxellent", fluctuate between 18-28%. The mean propotion of response "Fair" is 7-15%, and 2-6% for those who responsed "Poor", which showed narrower distribution than the "Good" to "Excellent". It is obvious that one state - "WV", in light lime, had lower average proportion of responses across years in the "Excellent", but higher in the "Poor". The "Overall Health" could be lower in this state due to this noticeable difference in the distribution of average proportion of different responses.
 
 #Problem 2
-```{r load_food_data, results= ='hide'}
+```{r load_food_data, results = FALSE}
 data(instacart)
-skimr::skim(instacart) %>% 
+skimr::skim(instacart) 
 ```
 **1. Exploration of dataset**. 
 Write a short description of the dataset, noting the size and structure of the data, describing some key variables, and giving illstrative examples of observations. 
@@ -128,11 +131,17 @@ Write a short description of the dataset, noting the size and structure of the d
 **Description**The dataset has 15 variables and 1384617 observations without missing values. The names have been cleaned with character variables of aisle, department, eval_set and product_name, integer variables of add_to_cart_order, aisle_id, days_since_prior_order, department_id, order_dow, order_hour_of_day, order_id, order_number, product_id, reordered and user_id. The variables can be put into 6 classes: 1.id to track a order/orderer (order, user)(id), 2. catergories and identification of a product (department, aisle, product)(name, id), 3. order time/location distribution (order_hour_of_day, order_dow, eval_set), 4. frequency of order (reorder, days_since_prior_order), 5. other character of user behavior (add_to_cart_order). And two variables I don not know what exactly meaning yet is (order_number).
 
 It seems to be a dataset about shopping records of `r n_distinct(instacart$user_id)` users and their `r n_distinct(instacart$order_id)` orders, thus each user had made only one order during the dataset study period. 
+
 There is a total `r n_distinct(instacart$product_id)` kinds of products, in `r n_distinct(instacart$department)` departments and `r n_distinct(instacart$aisle)` aisles. Products, aisles, and departments were recored with both name(character) and ID(integer). 
+
 Through 0 to 23, orders are most often made at`r median(instacart$order_hour_of_day)`, mostly between`r quantile(instacart$order_hour_of_day,c(0.25, 0.75))`. Throuhgh day 0 to 6 in a week, orders are most often made at`r median(instacart$order_dow)`, mostly between`r quantile(instacart$order_dow, c(0.25, 0.75))`.  Train is the only location in eval_set. 
-The average reorder rate is `r mean(instacart$reorder)`, with average days since prior order of `r mean(instacart$days_since_prior_order)`+/-`r sd(instacart$days_since_prior_order)`, the median is `r median(instacart$days_since_prior_order)`, range between `r quantile(instacart$days_since_prior_order, c(0,1))`.
-The mean number of add_to_cart_order is `r mean(instacart$add_to_cart_order)`+/-`r sd(instacart$add_to_cart_order)`, and the median is `r median(instacart$add_to_cart_order)`, range between `r quantile(instacart$add_to_cart_order, c(0,1))`.
-The mean number of order_number is `r mean(instacart$order_number)`+/-`r sd(instacart$order_number)`, and median is `r median(instacart$order_number)`, range between `r quantile(instacart$order_number, c(0,1))`.
+
+The average reorder rate is `r round(mean(instacart$reordered), digits = 3)`, with average days since prior order of `r round(mean(instacart$days_since_prior_order), digits = 3)`+/-`r round(sd(instacart$days_since_prior_order), digits = 3)`, the median is `r median(instacart$days_since_prior_order)`, range between `r quantile(instacart$days_since_prior_order, c(0,1))`.
+
+The mean number of add_to_cart_order is `r round(mean(instacart$add_to_cart_order), digits = 3)`+/-`r round(sd(instacart$add_to_cart_order), digits = 3)`, and the median is `r median(instacart$add_to_cart_order)`, range between `r quantile(instacart$add_to_cart_order, c(0,1))`.
+
+The mean number of order_number is `r round(mean(instacart$order_number), digits = 3)`+/-`r round(sd(instacart$order_number), digits = 3)`, and median is `r round(median(instacart$order_number), digits = 3)`, range between `r quantile(instacart$order_number, c(0,1))`.
+
 ```{r explore_most_popular}
 instacart %>% 
   group_by(product_name) %>% 
@@ -333,14 +342,15 @@ p5
 (ii) make a plot showing the distribution of snowfall values greater than 0 and less than 100 separately by year.
 
 ```{r tmax_tmin_snow_plot}
+tem_unit = "Temperature (°C)"
 p6 = ny_noaa1 %>% 
   select(id, year, tmax_c, tmin_c) %>% 
   ggplot(aes(x = tmin_c, y = tmax_c)) +
   geom_smooth(se = TRUE)+
   labs(
     title = "Overall tmax vs tmin",
-    y = "°C",
-    x = "°C",
+    y = tem_unit,
+    x = tem_unit,
     caption = "Data from ny_noaa"
   ) 
 
