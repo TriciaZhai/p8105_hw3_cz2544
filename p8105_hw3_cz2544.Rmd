@@ -123,7 +123,7 @@ data(instacart)
 skimr::skim(instacart) %>% 
 ```
 **1. Exploration of dataset**. 
-Write a short description of the dataset, noting the size and structure of the data, describing some key variables, and giving illstrative examples of observations. Then, do or answer the following (commenting on the results of each):
+Write a short description of the dataset, noting the size and structure of the data, describing some key variables, and giving illstrative examples of observations. 
 
 **Description**The dataset has 15 variables and 1384617 observations without missing values. The names have been cleaned with character variables of aisle, department, eval_set and product_name, integer variables of add_to_cart_order, aisle_id, days_since_prior_order, department_id, order_dow, order_hour_of_day, order_id, order_number, product_id, reordered and user_id. The variables can be put into 6 classes: 1.id to track a order/orderer (order, user)(id), 2. catergories and identification of a product (department, aisle, product)(name, id), 3. order time/location distribution (order_hour_of_day, order_dow, eval_set), 4. frequency of order (reorder, days_since_prior_order), 5. other character of user behavior (add_to_cart_order). And two variables I don not know what exactly meaning yet is (order_number).
 
@@ -145,6 +145,7 @@ instacart %>%
   summarise(n = n(), mean(reordered), mean(days_since_prior_order)) %>% 
   knitr::kable(digits = 2)
 ```
+
 The top 3 popular products are : Banana, Bag of Organic Bananas, and Organic Strawberries, all sold over 10000, with mean reorder rate of 0.88, 0.86, 0.79 and mean days since prior order for these products are 16.71, 15.74 and 15.45. The 4th and 5th most popular products are Large Lemon and Organic Baby Spinach, bought 9784 and 8135 times with mean reorder rate of 0.82, 0.73 and mean days since prior order 17.12, 17.58.
 
 The following is a plot showing how products of different departments is distributed in different reorder rate and number of purchases. It may crash R so it won't run during the knitting.
@@ -182,6 +183,7 @@ instacart %>%
   filter(row_number() <= 10) %>% 
   knitr::kable(digits = 2)
 ```
+
 **Comment:** There are 134 aisles, most items are ordered from fresh vegetables, fresh fruits, packaged  vegetables fruits, yogurt, packaged cheese, water seltzer sparkling water, milk, chips pretzels, soy lactosefree and bread.
 
 **Make a plot** that shows the number of items ordered in each aisle. Order aisles sensibly, and organize your plot so others can read it.
@@ -235,6 +237,7 @@ instacart %>%
   filter(n == max(n)) %>% 
   knitr::kable(digits = 2)
 ```
+
 **Comment:**The most popular item in baking ingredients is Light Brown Sugar, bought 499 times; The most popular item in dog food care is Snack Sticks Chicken & Rice Recipe Dog Treats bought 30 times, and The most popular item in packaged vegetables fruits is Organic Baby Spinach, bought 9784 times. As shown previously, there is huge differences in popularity of total purchases in different aisles, now find out the popularity difference in most popular items in different aisles is not a supprise. 
 
 **Make a table** showing the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week; format this table for human readers (i.e. produce a 2 x 7 table).
@@ -298,6 +301,7 @@ ny_noaa1 %>%
   head() %>% 
   knitr::kable() 
 ```
+
 **Comment:** The most common observed values for snowfall are 0 (2008508 observations), NA (381221 observations), and followed by 2.5cm, 1.3cm, 5.1cm and 7.6cm. For the climate of New York state is generally humid continental, and there is no snow in majority of the months.
 
 **Make a two-panel plot** showing the average max temperature in January and in July in each station across years. Is there any observable / interpretable structure? Any outliers?
@@ -321,6 +325,7 @@ p5 = ny_noaa1 %>%
 ggsave("tmax_in_jan_jul.pdf", p5, dpi = 300)
 p5
 ```
+
 **Comment:** There is only 150 complete records, while the rest contains different amount of NAs. I plotted the average max temperature in January and in July and the distribution of defferent percentage of NAs. In January, the average max temperature is between -6°C and 6°C for most stations, there are three outliers fell below the range, namely with about 99%, 30% and 10% NAs. In July, the average max temperature is around 23°C to 32°C, no significant outlier has been ovserved. 
 
 **Make a two-panel plot** showing:
@@ -343,7 +348,7 @@ p7_1 = ny_noaa1 %>%
   mutate(year = as.numeric(year)) %>% 
   filter(snow_cm >0, snow_cm <100, year >=1981, year<=1990 ) %>%
   select(year, month, snow_cm) %>% 
-  ggplot(aes(x = snow_cm, color = "navy")) +
+  ggplot(aes(x = snow_cm)) +
   geom_density() +
   labs(
     title = "Distribution of snowfall",
@@ -356,7 +361,7 @@ p7_2 =  ny_noaa1 %>%
   mutate(year = as.numeric(year)) %>% 
   filter(snow_cm >0, snow_cm <100, year >=1991, year<=2000 ) %>%
   select(year, month, snow_cm) %>% 
-  ggplot(aes(x = snow_cm, color = "navy")) +
+  ggplot(aes(x = snow_cm)) +
   geom_density() + 
   labs(x = NULL) +
   facet_grid(rows = vars(year)) +
@@ -366,7 +371,7 @@ p7_3 =  ny_noaa1 %>%
   mutate(year = as.numeric(year)) %>% 
   filter(snow_cm >0, snow_cm <100, year >=2001, year<=2010 ) %>%
   select(year, month, snow_cm) %>% 
-  ggplot(aes(x = snow_cm, color = "navy")) +
+  ggplot(aes(x = snow_cm)) +
   geom_density() +
   labs( x = NULL,
         caption = "Data from ny_noaa") +
