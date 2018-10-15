@@ -72,10 +72,10 @@ p1 = brfss_tidy %>%
   scale_x_continuous(breaks = c(2002,2003,2004,2005,2006,2007,2008),
                      limits = c(2002, 2008)) +
   viridis::scale_color_viridis(option="inferno", name = "States", discrete = TRUE) +
-  theme(legend.direction = "horizontal", legend.key.size = unit(0.3, "cm"),
-        legend.text = element_text(size = 6),
-        legend.title = element_text(size = 6))
-p1_s = p1 + guides(col = guide_legend(ncol = 26, nrow = 2, override.aes = list(size = 1.5)))
+  theme(legend.direction = "horizontal", legend.key.size = unit(0.2, "cm"),
+        legend.text = element_text(size = 4),
+        legend.title = element_text(size = 4))
+p1_s = p1 + guides(col = guide_legend(ncol = 26, nrow = 2, override.aes = list(size = 1)))
 ggsave("number_of_each_place_spaghetti_plot.pdf", p1_s, dpi = 600)
 p1_s
 ```
