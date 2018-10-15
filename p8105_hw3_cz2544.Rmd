@@ -29,6 +29,7 @@ Format the data to use appropriate variable names;
 Focus on the “Overall Health” topic
 Include only responses from “Excellent” to “Poor”
 Organize responses as a factor taking levels ordered from “Excellent” to “Poor”
+
 ```{r data_clean}
 brfss_tidy = brfss_smart2010 %>% 
   janitor::clean_names() %>% 
@@ -37,8 +38,10 @@ brfss_tidy = brfss_smart2010 %>%
   rename(prop = data_value) %>% 
   mutate(response = factor(response, levels = c("Excellent","Very good","Good","Fair","Poor" )))
 ```
+
 **2. Using this dataset, do or answer the following (commenting on the results of each):**
 **In 2002, which states were observed at 7 locations?**
+
 ```{r who_is_7}
 brfss_tidy %>% 
   filter(year == 2002) %>% 
@@ -51,6 +54,7 @@ brfss_tidy %>%
 **Comment:** In 2002, there were three states observed at 7 locations: Connecticut, Florida and North Carolina.
 
 **Make a “spaghetti plot” that shows the number of locations in each state from 2002 to 2010.**
+
 ```{r number_of_each_place_plot}
 p1 = brfss_tidy %>%
   group_by(locationabbr, year) %>% 
@@ -75,9 +79,11 @@ p1_s = p1 + guides(col = guide_legend(ncol = 26, nrow = 2, override.aes = list(s
 ggsave("number_of_each_place_spaghetti_plot.pdf", p1_s, dpi = 600)
 p1_s
 ```
+
 **Comment:**The number of locations in each state from 2002 to 2010 is generally stably below 10 for most states, but there are four states showed some increase and showed number between 10 and 20. In 2007, there is one state  showed significantly high number over 40 while its average number in all other years is below 10. After rechecking the data found it is Florida. Florida has 67 counties so the number is possible. In a spaghetti with over 50 variables, which color is what is just imposibble to distinguish, only outstanding values would be easier to recognize.
 
 **Make a table showing, for the years 2002, 2006, and 2010, the mean and standard deviation of the proportion of “Excellent” responses across locations in NY State.**
+
 ```{r table_new_york_3_year}
 brfss_tidy %>%
   filter(year %in% c(2002, 2006, 2010), locationabbr == "NY", response == "Excellent") %>% 
@@ -85,9 +91,11 @@ brfss_tidy %>%
   summarise(mean(prop), sd(prop)) %>% 
   knitr::kable(digits = 2)
 ```
+
 **Comment:**The mean and standard deviation of the proportion of “Excellent” responses across locations in NY State is not very different in year 2002, 2006 and 2010. The year 2002 showed slightly higher mean but also higher standard deviation.
 
 **For each year and state, compute the average proportion in each response category (taking the average across locations in a state). Make a five-panel plot that shows, for each response category separately, the distribution of these state-level averages over time.**
+
 ```{r response_proportion_plot}
 p2 = brfss_tidy %>%
   group_by(year, locationabbr, response) %>% 
@@ -118,17 +126,30 @@ p2_s = p2 + guides(col = guide_legend(ncol = 26, nrow = 2, override.aes = list(s
 ggsave("response_proportion_plot.pdf", p2_s, dpi = 600)
 p2_s
 ```
+
 **Comment:**The diatribution of mean average proportion in each response category is different, with highest mean average proportion in "Very Good", mainly between 30-40%, then "Good", majority falled into 25-35%, then followed by "Ecxellent", fluctuate between 18-28%. The mean propotion of response "Fair" is 7-15%, and 2-6% for those who responsed "Poor", which showed narrower distribution than the "Good" to "Excellent". It is obvious that one state - "WV", in light lime, had lower average proportion of responses across years in the "Excellent", but higher in the "Poor". The "Overall Health" could be lower in this state due to this noticeable difference in the distribution of average proportion of different responses.
 
 #Problem 2
+
 ```{r load_food_data, results = FALSE}
 data(instacart)
 skimr::skim(instacart) 
 ```
+
 **1. Exploration of dataset**. 
 Write a short description of the dataset, noting the size and structure of the data, describing some key variables, and giving illstrative examples of observations. 
 
-**Description**The dataset has 15 variables and 1384617 observations without missing values. The names have been cleaned with character variables of aisle, department, eval_set and product_name, integer variables of add_to_cart_order, aisle_id, days_since_prior_order, department_id, order_dow, order_hour_of_day, order_id, order_number, product_id, reordered and user_id. The variables can be put into 6 classes: 1.id to track a order/orderer (order, user)(id), 2. catergories and identification of a product (department, aisle, product)(name, id), 3. order time/location distribution (order_hour_of_day, order_dow, eval_set), 4. frequency of order (reorder, days_since_prior_order), 5. other character of user behavior (add_to_cart_order). And two variables I don not know what exactly meaning yet is (order_number).
+**Description**The dataset has 15 variables and 1384617 observations without missing values. The names have been cleaned with character variables of aisle, department, eval_set and product_name, integer variables of add_to_cart_order, aisle_id, days_since_prior_order, department_id, order_dow, order_hour_of_day, order_id, order_number, product_id, reordered and user_id. The variables can be put into 6 classes: 
+
+1.id to track a order/orderer (order, user)(id),
+
+2. catergories and identification of a product (department, aisle, product)(name, id),
+
+3. order time/location distribution (order_hour_of_day, order_dow, eval_set), 
+
+4. frequency of order (reorder, days_since_prior_order), 
+
+5. other character of user behavior (add_to_cart_order). And two variables I don not know what exactly meaning yet is (order_number).
 
 It seems to be a dataset about shopping records of `r n_distinct(instacart$user_id)` users and their `r n_distinct(instacart$order_id)` orders, thus each user had made only one order during the dataset study period. 
 
@@ -158,6 +179,7 @@ instacart %>%
 The top 3 popular products are : Banana, Bag of Organic Bananas, and Organic Strawberries, all sold over 10000, with mean reorder rate of 0.88, 0.86, 0.79 and mean days since prior order for these products are 16.71, 15.74 and 15.45. The 4th and 5th most popular products are Large Lemon and Organic Baby Spinach, bought 9784 and 8135 times with mean reorder rate of 0.82, 0.73 and mean days since prior order 17.12, 17.58.
 
 The following is a plot showing how products of different departments is distributed in different reorder rate and number of purchases. It may crash R so it won't run during the knitting.
+
 ```{r explore_popularity_reorder_diatribution, eval = FALSE}
 p3 = instacart %>% 
   group_by(department) %>% 
@@ -184,6 +206,7 @@ p3_s
 
 **2. Questions**
 **How many aisles** are there, and which aisles are the most items ordered from?
+
 ```{r aisles_analysis}
 instacart %>% 
   group_by(aisle) %>% 
@@ -196,6 +219,7 @@ instacart %>%
 **Comment:** There are 134 aisles, most items are ordered from fresh vegetables, fresh fruits, packaged  vegetables fruits, yogurt, packaged cheese, water seltzer sparkling water, milk, chips pretzels, soy lactosefree and bread.
 
 **Make a plot** that shows the number of items ordered in each aisle. Order aisles sensibly, and organize your plot so others can read it.
+
 ```{r plot_aisle_item_number}
 aisle_rank =
   instacart %>% 
@@ -232,9 +256,11 @@ p4_s = p4 + guides(col = guide_legend(ncol = 134, nrow = 1,
 ggsave("aisle_plot.pdf", p4_s, dpi = 600)
 p4_s
 ```
+
 **Comment:**The range of number of items ordered in each aisle is very big, thus display the number in log transformation might make it easier to read. The size of plot and legend change at different rate while I zoom in and out, ggsave as pdf is a better way to guarantee reproducibility.
 
 **Make a table** showing the most popular item in each of the aisles “baking ingredients”, “dog food care”, and “packaged vegetables fruits”.
+
 ```{r table_popular_item_in_three_aisles}
 instacart %>% 
   filter(aisle %in% c("baking ingredients", "dog food care", "packaged vegetables fruits")) %>% 
@@ -250,6 +276,7 @@ instacart %>%
 **Comment:**The most popular item in baking ingredients is Light Brown Sugar, bought 499 times; The most popular item in dog food care is Snack Sticks Chicken & Rice Recipe Dog Treats bought 30 times, and The most popular item in packaged vegetables fruits is Organic Baby Spinach, bought 9784 times. As shown previously, there is huge differences in popularity of total purchases in different aisles, now find out the popularity difference in most popular items in different aisles is not a supprise. 
 
 **Make a table** showing the mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week; format this table for human readers (i.e. produce a 2 x 7 table).
+
 ```{r table_hour_Apples_Coffee_Ice_Cream}
 instacart %>%
   filter(product_name %in% c("Pink Lady Apples","Coffee Ice Cream")) %>% 
@@ -266,17 +293,22 @@ instacart %>%
 ```{r}
 data("ny_noaa")
 ```
+
 The goal is to do some exploration of this dataset. To that end, write a short description of the dataset, noting the size and structure of the data, describing some key variables, and indicating the extent to which missing data is an issue. 
+
 **1. Exploration of dataset**. 
+
 ```{r }
 ny_noaa %>% 
   skimr::skim()
 ```
+
 **Description**: There are 7 variables with 2595176 statistics in this dataset. The variables are of three type: One date variable range from 1981-01-01 to 1997-01-21, total 10957 days. Three characters variables id, tmax and tmin, there is 747 unique ids, 43.7% of tmax(1134358/2595176) and tmin(1134420/2595176) values are missing. There is three integer variables prcp, snow and snwd, all with high percentage of missing values, namely 5.65% = (145838/2595176) for prcp, 14.69% = (381221/2595176) for snow and 22.80% = (591786/2595176) for snwd. All three distribution of data are very skewed. The outliers are very large accompanied by over half in prcp or over 75% in snow and snwd of the values equals 0.
 
 
 **2. Questions**
 **data cleaning**. Create separate variables for year, month, and day. Ensure observations for temperature, precipitation, and snowfall are given in reasonable units. 
+
 ```{r clean_noaa}
 ny_noaa1 = ny_noaa %>% 
   separate("date", c("year", "month", "day"), sep = "-") %>% 
@@ -284,6 +316,7 @@ ny_noaa1 = ny_noaa %>%
          tmax_c = as.numeric(tmax)/10, tmin_c = as.numeric(tmin)/10) %>% 
   select(id, year:day, prcp_mm:tmin_c)
 ```
+
 **Comment:** 
 According to https://www1.ncdc.noaa.gov/pub/data/ghcn/daily/readme.txt, the five core elements are:
 PRCP = Precipitation (tenths of mm)
@@ -302,6 +335,7 @@ Lowest temperature:	−52 °F or −46.7 °C
 I decided to change the units to the wikipedia format.
 
 **For snowfall, what are the most commonly observed values? Why?**
+
 ```{r snow_mode}
 ny_noaa1 %>% 
   group_by(snow_cm) %>% 
@@ -314,6 +348,7 @@ ny_noaa1 %>%
 **Comment:** The most common observed values for snowfall are 0 (2008508 observations), NA (381221 observations), and followed by 2.5cm, 1.3cm, 5.1cm and 7.6cm. For the climate of New York state is generally humid continental, and there is no snow in majority of the months.
 
 **Make a two-panel plot** showing the average max temperature in January and in July in each station across years. Is there any observable / interpretable structure? Any outliers?
+
 ```{r tmax_1_7_plot}
 p5 = ny_noaa1 %>% 
   filter(month %in% c("01", "07")) %>% 
@@ -342,16 +377,14 @@ p5
 (ii) make a plot showing the distribution of snowfall values greater than 0 and less than 100 separately by year.
 
 ```{r tmax_tmin_snow_plot}
-tem_unit = "Temperature (°C)"
 p6 = ny_noaa1 %>% 
   select(id, year, tmax_c, tmin_c) %>% 
   ggplot(aes(x = tmin_c, y = tmax_c)) +
   geom_smooth(se = TRUE)+
   labs(
     title = "Overall tmax vs tmin",
-    y = tem_unit,
-    x = tem_unit,
-    caption = "Data from ny_noaa"
+    y = "Tmax (C)",
+    x = "Tmax (C)",
   ) 
 
 p7_1 = ny_noaa1 %>%
@@ -365,7 +398,8 @@ p7_1 = ny_noaa1 %>%
     x = "Snowfall cm"
   ) +
   facet_grid(rows = vars(year)) +
-  theme(axis.text.y = element_text(size = 4))
+  theme(axis.text.y = element_text(size = 4), axis.text.x = element_text(size = 4),
+        strip.text  = element_text(size = 4, angle = 90))
   
 p7_2 =  ny_noaa1 %>%
   mutate(year = as.numeric(year)) %>% 
@@ -373,20 +407,22 @@ p7_2 =  ny_noaa1 %>%
   select(year, month, snow_cm) %>% 
   ggplot(aes(x = snow_cm)) +
   geom_density() + 
-  labs(x = NULL) +
+  labs(x = NULL, y = NULL) +
   facet_grid(rows = vars(year)) +
-  theme(axis.text.y = element_text(size = 4)) 
-
+  theme(axis.text.y = element_text(size = 4), axis.text.x = element_text(size = 4),
+        strip.text  = element_text(size = 4, angle = 90))
+  
 p7_3 =  ny_noaa1 %>%
   mutate(year = as.numeric(year)) %>% 
   filter(snow_cm >0, snow_cm <100, year >=2001, year<=2010 ) %>%
   select(year, month, snow_cm) %>% 
   ggplot(aes(x = snow_cm)) +
   geom_density() +
-  labs( x = NULL,
+  labs( x = NULL, y = NULL,
         caption = "Data from ny_noaa") +
   facet_grid(rows = vars(year)) +
-  theme(axis.text.y = element_text(size = 4))  
+  theme(axis.text.y = element_text(size = 4), axis.text.x = element_text(size = 4),
+        strip.text  = element_text(size = 4, angle = 90))
   
 p8 = (p6 + (p7_1 + p7_2 + p7_3)) 
 ggsave("tmax_tmin_snow_plot.pdf", p8, dpi = 300)
